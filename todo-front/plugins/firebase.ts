@@ -1,24 +1,25 @@
+
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDgvHdDQj8H5OJbcJcN5V8r-NgvYAg--5I",
-    authDomain: "todospa-ae72e.firebaseapp.com",
-    projectId: "todospa-ae72e",
-    storageBucket: "todospa-ae72e.firebasestorage.app",
-    messagingSenderId: "453868303112",
-    appId: "1:453868303112:web:bce79eac0bef9d0b9872bd"
-};
-
-// Firebase アプリの初期化（重複を防ぐ）
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-export{auth};
-
-export default defineNuxtPlugin(() => {  
-  return {
-    provide: {
-      auth,
-    },
+export default defineNuxtPlugin((nuxtApp) => {
+  
+  // 環境変数を取得
+  const config = useRuntimeConfig();
+  
+  // Firebase 設定を環境変数から取得
+  const firebaseConfig = {
+    apiKey: config.public.FIREBASE_API_KEY as string,
+    authDomain: config.public.FIREBASE_AUTH_DOMAIN as string,
+    projectId: config.public.FIREBASE_PROJECT_ID as string,
+    storageBucket: config.public.FIREBASE_STORAGE_BUCKET as string,
+    messagingSenderId: config.public.FIREBASE_MESSAGING_SENDER_ID as string,
+    appId: config.public.FIREBASE_APP_ID as string,
   };
+
+  // Firebase アプリの初期化（重複を防ぐ）
+  const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+  const auth = getAuth(app);
+
+  nuxtApp.provide('auth', auth);
 });

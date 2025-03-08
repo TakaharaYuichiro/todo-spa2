@@ -13,7 +13,7 @@ class AuthController extends Controller
 
   public function __construct(FirebaseAuth $firebaseAuth)
   {
-      $this->firebaseAuth = $firebaseAuth;
+    $this->firebaseAuth = $firebaseAuth;
   }
 
   public function register(Request $request)
@@ -48,25 +48,26 @@ class AuthController extends Controller
     }
   }
 
-  public function getUserName(Request $request){
+  public function getUserName(Request $request)
+  {
     try {
       // Firebaseのトークンを検証
       $verifiedIdToken = $this->firebaseAuth->verifyIdToken($request->idToken);
       $firebaseUserId = $verifiedIdToken->claims()->get('sub');
 
       $user = User::where('firebase_uid', $firebaseUserId)->first();
-      // $name = $user->name;
       return response()->json(['id' => $user->id, 'name' => $user->name], 201);
     } catch (\Exception $e) {
       return response()->json(['error' => 'エラー', 'message' => $e->getMessage()], 401);
     }
   }
 
-  public function getUsers() {
+  public function getUsers()
+  {
     try {
       $users = User::select('id', 'name')->get();
       return response()->json($users, 201);
-    }catch (\Exception $e) {
+    } catch (\Exception $e) {
       return response()->json(['error' => 'エラー', 'message' => $e->getMessage()], 401);
     }
   }

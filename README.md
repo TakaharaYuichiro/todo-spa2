@@ -2,6 +2,9 @@
 
 ToDo(やること)を可視化するアプリです。個人の予定管理や、作業の抜け漏れ防止、チーム全体の情報管理に役立ちます。
 
+|![sample image](readme/imgs/main.png)|
+|:-:|
+
 ## アプリの概要
 
 - Laravel演習講座の「ToDoアプリ」をベースに、バックエンドをLaravel、フロントエンドをNuxt.jsで構築してSPA化しました。
@@ -27,7 +30,7 @@ ToDo(やること)を可視化するアプリです。個人の予定管理や�
 
 ## 動作検証に必要なサイト
 
-- Firebase
+- Firebase : <https://firebase.google.com/?hl=ja>
 
 ## 他のリポジトリ
 
@@ -51,7 +54,7 @@ ToDo(やること)を可視化するアプリです。個人の予定管理や�
 
 1. https://firebase.google.com/?hl=ja へアクセスします
 2. 右上の「ログイン」ボタンからログインします
-3. ログインできたら「コンソールへ移動(Go to console)」をクリックします
+3. ログイン後、「コンソールへ移動(Go to console)」をクリックします
 
 ### Firebaseプロジェクトの作成
 
@@ -75,7 +78,24 @@ ToDo(やること)を可視化するアプリです。個人の予定管理や�
 2. タブから「サービスアカウント」を選択します
 3. 「新しい秘密鍵を生成」をクリックし、秘密鍵（JSONファイル）をダウンロードします
 
->このJSONファイルを、のちほどLaravelのLaravelのstorageに保存し、.envファイルにファイル名を記載します
+>このJSONファイルを、のちほどLaravelのstorageに保存し、.envファイルにファイル名を記載します
+
+### Firebase設定値の確認
+
+1. Firebaseコンソールの左のメニューの設定アイコンから「プロジェクトの設定」をクリックします
+2. タブから「全般」を選択します
+3. 「マイアプリ」に記載されている以下の設定値をメモ帳等にコピーしておきます
+
+    ``` text
+    apiKey:xxxxxx
+    authDomain:xxxxxx
+    projectId:xxxxxx
+    storageBucket:xxxxxx
+    messagingSenderId:xxxxxx
+    appId:xxxxxx
+    ```
+
+>この設定値を、のちほどNuxt.jsの.envファイルに記載します
 
 ## バックエンドアプリ環境構築
 
@@ -167,7 +187,30 @@ ToDo(やること)を可視化するアプリです。個人の予定管理や�
     php artisan storage:link
     ```
 
+## フロントエンドアプリ環境構築
+
+### Nuxt.js環境構築
+
+1. todo-frontディレクトリに移動してください
+
+2. そのディレクトリ直下の「.env.example」ファイルをコピーし「.env」に名称を変更してください。または、新しく.envファイルを作成してください
+
+3. .envファイル内のFirebaseに関する設定を記載してください
+
+    ``` text
+    NUXT_PUBLIC_API_URL=http://localhost
+
+    NUXT_PUBLIC_FIREBASE_API_KEY=xxxxxxx
+    NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN=xxxxxxx
+    NUXT_PUBLIC_FIREBASE_DATABASE_URL=xxxxxxx
+    NUXT_PUBLIC_FIREBASE_PROJECT_ID=xxxxxxx
+    NUXT_PUBLIC_FIREBASE_STORAGE_BUCKET=xxxxxxx
+    NUXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=xxxxxxx
+    NUXT_PUBLIC_FIREBASE_APP_ID=xxxxxxx
     
+    ```
+
+    >xxxxxxxは、先ほどメモ帳等に記録したFirebaseの設定値です
 
 ## 動作検証方法
 
@@ -188,26 +231,49 @@ ToDo(やること)を可視化するアプリです。個人の予定管理や�
 5. 会員登録画面で、お名前、メールアドレス、パスワードを入力し、「会員登録」をクリックしてください
 6. アプリのホーム画面が表示されます
 
-## 機能一覧
+## API仕様
 
-### 基本機能
+### ユーザー登録
 
-工事中
+Firebaseに登録したユーザーのuidと、その他のユーザー情報を紐づけるためのテーブルにデータを登録します。
 
-### 追加実装機能
+* [ユーザー登録](login.md) : `POST /api/register`
 
-工事中
+### ユーザーデータ取得
+
+DBに登録されているユーザーデータを取得します。
+
+* [ユーザー一覧取得](readme/apis/get_users.md) : `GET /api/users/`
+* [ユーザーチェック](readme/apis/get_username.md) : `GET /api/usercheck?idToken={idToken}`
+
+### ToDoデータ操作
+
+ToDoデータの取得や登録などの操作をするためのエンドポイントです。
+
+* [全てのデータ取得](readme/apis/todo/index.md) : `GET /api/todo/`
+* [データ登録](readme/apis/todo/store.md) : `POST /api/todo/`
+* [データ取得](readme/apis/todo/show.md) : `GET /api/todo/{id}/`
+* [データ更新](readme/apis/todo/update.md) : `PUT /api/todo/{id}/`
+* [データ削除](readme/apis/todo/destroy.md) : `DELETE /api/todo/{id}/`
+
+### Categoryデータ操作
+
+Categoryデータの取得や登録などの操作をするためのエンドポイントです。
+
+* [全てのデータ取得](readme/apis/category/index.md) : `GET /api/category/`
+* [データ登録](readme/apis/category/store.md) : `POST /api/category/`
+* [データ取得](readme/apis/category/show.md) : `GET /api/category/{id}/`
+* [データ更新](readme/apis/category/update.md) : `PUT /api/category/{id}/`
+* [データ削除](readme/apis/category/destroy.md) : `DELETE /api/category/{id}/`
 
 ## テーブル設計
 
-工事中
+![TABLE SPECIFICATION](readme/imgs/datatable_users2.png)
+![TABLE SPECIFICATION](readme/imgs/datatable_todos2.png)
+![TABLE SPECIFICATION](readme/imgs/datatable_categories2.png)
 
 ## ER図
 
-工事中
-
-## その他補足事項
-
-工事中
+![TABLE SPECIFICATION](readme/imgs/er_diagram.png)
 
 以上

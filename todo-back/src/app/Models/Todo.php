@@ -14,11 +14,13 @@ class Todo extends Model
     'content'
   ];
 
-  public function user(){
+  public function user()
+  {
     return $this->belongsTo(User::class);
   }
-  public function category(){
-      return $this->belongsTo(Category::class);
+  public function category()
+  {
+    return $this->belongsTo(Category::class);
   }
 
   public function scopeCategorySearch($query, $category_id)
@@ -27,12 +29,11 @@ class Todo extends Model
       $query->where('category_id', $category_id);
     }
   }
-  
+
   public function scopeKeywordSearch($query, $keyword)
   {
     if (!empty($keyword)) {
       $query->where('content', 'like', '%' . $keyword . '%');
     }
   }
-
 }

@@ -4,7 +4,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TodoController;
 use App\Http\Controllers\CategoryController;
-
 use App\Http\Controllers\AuthController;
 
 /*
@@ -30,6 +29,12 @@ Route::middleware(['firebase'])->group(function () {
   Route::apiResource('/category', CategoryController::class);  
 });
 
-Route::post('/username', [AuthController::class, 'getUserName']);
+// Route::post('/username', [AuthController::class, 'getUserName']);
+// Route::get('/usercheck', [AuthController::class, 'getUserName']);
+
+
+Route::get('/usercheck', [AuthController::class, 'getUserName'])->missing(function (Request $request) {
+  return response()->json(['message' => 'User not found'], 404);
+});
 
 
