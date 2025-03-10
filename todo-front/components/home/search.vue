@@ -13,8 +13,14 @@
               </button>
             </div>
           </th>
+          <th class="search-table__header-button" rowspan="2">
+            <div class="search-table__button">
+              <button class="search-table__button-reset" type="button" @click="resetSearch()">
+                リセット
+              </button>
+            </div>
+          </th>
         </tr>
-
         <tr>
           <td>
             <select v-model="searchUserId" class="search-table__item__select" placeholder="Select User">
@@ -59,6 +65,13 @@ const users = computed(() => props.users ?? []);
 
 const emit = defineEmits<{ (event: 'trigger-search', userId: number, categoryId: number, keyword: string): void; }>();
 const emitEvent = () => emit('trigger-search', searchUserId.value, searchCategoryId.value, searchKeyword.value);
+
+const resetSearch = () => {
+  searchKeyword.value = "";
+  searchCategoryId.value = 0;
+  searchUserId.value = 0;
+  emitEvent();
+};
 </script>
 
 <style scoped>
@@ -101,7 +114,7 @@ const emitEvent = () => emit('trigger-search', searchUserId.value, searchCategor
 
 .search-table__button-submit {
   padding: 1px 10px;
-  width: 100%;
+  width: 90px;
   height: 100%;
   border: none;
   border-radius: 3px;
@@ -111,12 +124,27 @@ const emitEvent = () => emit('trigger-search', searchUserId.value, searchCategor
   white-space: nowrap;
 }
 
-.search-table__button-submit:disabled {
+.search-table__button-reset {
+  padding: 1px 0px;
+  width: 50px;
+  height: 100%;
+  border: none;
+  border-radius: 3px;
+  background: #000;
+  color: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 0.65rem;
+}
+
+.search-table__button-submit:disabled,
+.search-table__button-reset:disabled {
   background: #aaa;
   pointer-events: none;
 }
 
-.search-table__button-submit:hover {
+.search-table__button-submit:hover,
+.search-table__button-reset:hover {
   background: #666;
 }
 </style>
