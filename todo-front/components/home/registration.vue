@@ -83,11 +83,6 @@ const emits = defineEmits(['trigger-registration']);
 const emitEvent = () => emits('trigger-registration');
 
 const storeTodo = async (newTodo: string): Promise<void> => {
-  // if (categoryId.value === 0) {
-  //   alert('カテゴリを設定してください');
-  //   return;
-  // }
-
   // ユーザーチェック
   if (currentUserInfo === null || currentUserInfo === undefined) {
     console.error("登録エラー", "ユーザー情報がありません");

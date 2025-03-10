@@ -5,33 +5,51 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Kreait\Firebase\Auth;
-use Kreait\Firebase\Factory;
-use Firebase\Auth\Token\Exception\InvalidToken;
+use App\Models\User;
+use Illuminate\Support\Facades\Cache;
 
 class FirebaseAuthMiddleware
 {
-    protected $auth;
+  protected $auth;
 
-    public function __construct()
-    {
-        $this->auth = (new Factory)->withServiceAccount(config('firebase.credentials'))->createAuth();
+  public function __construct(Auth $auth)
+  {
+    $this->auth = $auth; // サービスプロバイダーで作成したインスタンスを使用
+  }
+
+  public function handle(Request $request, Closure $next)
+  {
+    // Authorizationヘッダーを取得
+    $header = $request->header('Authorization');
+
+    if (!$header || !preg_match('/Bearer\s(\S+)/', $header, $matches)) {
+      return response()->json(['error' => 'Unauthorized'], 401);
     }
 
-    public function handle(Request $request, Closure $next)
-    {
-        $header = $request->header('Authorization');
+    $token = $matches[1];
+    $cacheKey = 'firebase_token_' . $token;
 
-        if (!$header || !preg_match('/Bearer\s(\S+)/', $header, $matches)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
+    // ユーザー情報をキャッシュから取得（なければFirebaseで検証）
+    $user = Cache::remember($cacheKey, 300, function () use ($token) {
+      try {
+        // Firebaseの公開鍵をキャッシュ
+        $publicKeys = Cache::remember('firebase_public_keys', 3600, function () {
+          return file_get_contents('https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com');
+        });
 
-        try {
-            $verifiedIdToken = $this->auth->verifyIdToken($matches[1]);
-            $request->attributes->set('firebase_user_id', $verifiedIdToken->claims()->get('sub'));
-        } catch (InvalidToken $e) {
-            return response()->json(['error' => 'Invalid token'], 401);
-        }
+        $verifiedIdToken = $this->auth->verifyIdToken($token, $publicKeys);
+        return User::where('firebase_uid', $verifiedIdToken->claims()->get('sub'))->first();
+      } catch (\Exception $e) {
+        return null;
+      }
+    });
 
-        return $next($request);
+    if (!$user) {
+      return response()->json(['error' => 'Unauthorized'], 401);
     }
+
+    $request->attributes->set('authenticated_user', $user);
+
+    return $next($request);
+  }
 }

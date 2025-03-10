@@ -19,7 +19,8 @@ return [
     */
 
     // 'driver' => env('SESSION_DRIVER', 'file'),
-    'driver' => env('SESSION_DRIVER', 'cookie'), // セッションをクッキーに保存
+    // 'driver' => env('SESSION_DRIVER', 'cookie'), // セッションをクッキーに保存
+    'driver' => env('SESSION_DRIVER', 'database'),
 
     /*
     |--------------------------------------------------------------------------

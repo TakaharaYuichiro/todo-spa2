@@ -48,14 +48,10 @@ class AuthController extends Controller
     }
   }
 
-  public function getUserName(Request $request)
+  public function usercheck(Request $request)
   {
     try {
-      // Firebaseのトークンを検証
-      $verifiedIdToken = $this->firebaseAuth->verifyIdToken($request->idToken);
-      $firebaseUserId = $verifiedIdToken->claims()->get('sub');
-
-      $user = User::where('firebase_uid', $firebaseUserId)->first();
+      $user = $request->attributes->get('authenticated_user');
       return response()->json(['id' => $user->id, 'name' => $user->name], 201);
     } catch (\Exception $e) {
       return response()->json(['error' => 'エラー', 'message' => $e->getMessage()], 401);

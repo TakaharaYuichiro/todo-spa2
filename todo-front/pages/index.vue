@@ -16,7 +16,6 @@
 <script setup lang="ts">
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { ref, onMounted, onUnmounted } from 'vue';
-import axios from 'axios';
 import type { Category } from '~/types/category';
 import type { Todo } from '~/types/todo';
 import type { User } from '~/types/user';
@@ -45,6 +44,11 @@ const eventRegistrationComponent = async () => {
 };
 
 const editorRef = ref<InstanceType<typeof editorComponent> | null>(null);
+const callChildMethod = (rowId: number) => {
+  if (editorRef.value) {
+    editorRef.value.scrollTable(rowId);
+  }
+};
 
 const eventSearchComponent = async (searchUserId: number, searchCategoryId: number, searchKeyword: string) => {
   try {
@@ -72,6 +76,9 @@ const readTodos = async () => {
       categoryId: datum.category_id,
       content: datum.content
     }));
+
+    // ToDoリストの表を一番下の行までスクロールさせる(editorコンポーネント内のメソッドにアクセス)
+    callChildMethod(-1);
   } catch (err) {
     console.log('読み込み失敗', err);
   }
@@ -107,19 +114,13 @@ let unsubscribe: any = null; // リスナーのクリーンアップ用
 
 onMounted(async () => {
   // Firebase認証のリスナーをセット
-  const auth =getAuth();
+  const auth = getAuth();
   unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
     if (currentUser) {
       try {
-        const idToken = await currentUser.getIdToken();
-        const userInfo = await axios.get(`${API_URL}/api/usercheck`, {
-          params: {
-            idToken: idToken
-          }
-        });
-
-        message.value = `${userInfo.data.name}さんがログイン中です`;
-        currentUserInfo.value = { id: userInfo.data.id, name: userInfo.data.name };
+        const userInfo = await fetchWithAuth(`${API_URL}/api/usercheck`);
+        message.value = `${userInfo.name}さんがログイン中です`;
+        currentUserInfo.value = { id: userInfo.id, name: userInfo.name };
 
       } catch (error) {
 

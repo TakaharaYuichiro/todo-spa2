@@ -26,15 +26,7 @@ Route::middleware(['firebase'])->group(function () {
 
   Route::get('/users', [AuthController::class, 'getUsers']);
   Route::apiResource('/todo', TodoController::class);
-  Route::apiResource('/category', CategoryController::class);  
+  Route::apiResource('/category', CategoryController::class);
+
+  Route::get('/usercheck', [AuthController::class, 'usercheck']);
 });
-
-// Route::post('/username', [AuthController::class, 'getUserName']);
-// Route::get('/usercheck', [AuthController::class, 'getUserName']);
-
-
-Route::get('/usercheck', [AuthController::class, 'getUserName'])->missing(function (Request $request) {
-  return response()->json(['message' => 'User not found'], 404);
-});
-
-

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" ref="tableContainer">
     <HomeModal @closeModal="eventModal" v-if="show" :categories="categories"
       :currentSelectedCategoryId="currentSelectedCategoryId" />
 
@@ -17,7 +17,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="todo in todos" :key="todo.id">
+        <tr v-for="(todo, index) in todos" :key="todo.id" :ref="(el: Element | null) => setRowRef(el, index)">
           <td class="tableData">
             <div class="itemText">{{ getUserName(todo.userId) }}</div>
           </td>
@@ -53,7 +53,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import type { Category } from '~/types/category';
 import type { Todo } from '~/types/todo';
 import type { User } from '~/types/user';
@@ -65,6 +65,13 @@ const API_URL = runtimeConfig.public.apiUrl;
 const show = ref(false);
 const targetTodoId = ref(0);
 const currentSelectedCategoryId = ref(0);
+const tableContainer = ref<HTMLDivElement | null>(null);
+const rowRefs = ref<(HTMLTableRowElement | null)[]>([]);
+const setRowRef = (el: HTMLTableRowElement | null, index: number) => {
+  if (el) {
+    rowRefs.value[index] = el;
+  }
+};
 
 const props = defineProps<{
   todos: Todo[] | null;
@@ -81,6 +88,36 @@ const currentUserInfo = computed(() => props.currentUserInfo);
 // 親ページへのイベント
 const emits = defineEmits(['trigger-editor']);
 const emitEvent = () => emits('trigger-editor');
+
+const scrollTable = (rowId: number) => {
+  nextTick(() => {
+    if (tableContainer.value) {
+      if (rowId < 0) {
+        // 一番下までスクロール
+        tableContainer.value?.scrollTo({
+          top: tableContainer.value.scrollHeight,
+          behavior: 'smooth'
+        });
+      } else {
+        // 指定した行までスクロール
+        const row = rowRefs.value[rowId];
+        console.log('rowRefs: ', rowRefs.value)
+        console.log('row: ', row)
+        if (row) {
+          tableContainer.value.scrollTo({
+            top: row.offsetTop, // 指定した行の位置までスクロール
+            behavior: 'smooth',
+          });
+        }
+      }
+    }
+  });
+};
+
+// 親ページからこのコンポーネントのメソッドを呼び出せるように公開
+defineExpose({
+  scrollTable,
+});
 
 // カテゴリ変更用のモーダル画面からのデータをイベントで受ける
 const eventModal = async (isCancel: boolean, selectedCategoryId: number) => {
@@ -99,6 +136,7 @@ const eventModal = async (isCancel: boolean, selectedCategoryId: number) => {
     // データ更新を親ページにイベントで伝える
     emitEvent();
     alert("カテゴリを更新しました！");
+
   } catch (error) {
     console.error("更新エラー", error);
   }
