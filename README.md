@@ -243,14 +243,14 @@ ToDo(やること)を可視化するアプリです。個人の予定管理や�
 
 Firebaseに登録したユーザーのuidと、その他のユーザー情報を紐づけるためのテーブルにデータを登録します。
 
-* [ユーザー登録](login.md) : `POST /api/register`
+* [ユーザー登録](readme/apis/register.md) : `POST /api/register`
 
 ### ユーザーデータ取得
 
 DBに登録されているユーザーデータを取得します。
 
-* [ユーザー一覧取得](readme/apis/get_users.md) : `GET /api/users/`
-* [ユーザーチェック](readme/apis/get_username.md) : `GET /api/usercheck?idToken={idToken}`
+* [ユーザー一覧取得](readme/apis/users.md) : `GET /api/users/`
+* [ユーザーチェック](readme/apis/usercheck.md) : `GET /api/usercheck/`
 
 ### ToDoデータ操作
 

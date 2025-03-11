@@ -1,9 +1,8 @@
-# ユーザー名取得
+# ユーザーチェック
 
 Firebaseの認証トークンを検証して現在のユーザーのログイン状況を確認した上で、登録されているユーザーIDとユーザー名を取得します。
 
-**URL** : `/api/usercheck?idToken={idToken}`
-  > idTokenはFirebaseの認証トークンです。
+**URL** : `/api/usercheck`
 
 **メソッド** : `GET`
 
@@ -11,7 +10,15 @@ Firebaseの認証トークンを検証して現在のユーザーのログイン
 
 **権限** : (権限なし)
 
-**ヘッダー制約** : なし
+**ヘッダー制約** :
+Firebase認証トークンを含めてください。
+
+```json
+{
+  "Authorization": `Bearer ${idToken}`, // Firebase認証トークン
+  "Content-Type": "application/json",
+}
+```
 
 ## 成功レスポンス
 
